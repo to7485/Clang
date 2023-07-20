@@ -50,14 +50,14 @@ FILE *fopen(const char * restrict filename, const char * restrict mode);
 
 ### 파일의 사용 용도를 결정하는데 사용할 수 있는 모드 문자열
 1. r (read mode) : 읽기 전용 모드
-  -  파일 없으면 NULL값 반환
+  	- 파일 없으면 NULL값 반환
 2. w (write mode) : 쓰기 전용 모드
-  - 파일 없으면 새로 생성
-  - 파일 있으면 내용 다 지우고 새로 만듦
-  - 여는 순간 파일 내용 다 날아감
+  	- 파일 없으면 새로 생성
+  	- 파일 있으면 내용 다 지우고 새로 만듦
+  	- 여는 순간 파일 내용 다 날아감
 3. a (append mode) : 추가 모드
-  - 파일 없으면 새로 생성
-  - 파일 있으면 내용 그대로 두고 뒤에 추가로 쓰게 됨
+  	- 파일 없으면 새로 생성
+  	- 파일 있으면 내용 그대로 두고 뒤에 추가로 쓰게 됨
 
 ### 파일의 데이터를 어떤 방식으로 입출력할지를 결정하는 사용할 수 있는 모드 문자열
 1. t (text mode) : 해당 파일의 데이터를 텍스트 파일로 인식하고 입출력함.
@@ -155,6 +155,48 @@ int main() {
 		fprintf(fp1, "name:%s\nage:%d\n", name, age);
 	}
 	fclose(fp1);
+
+	return 0;
+}
+```
+
+# 읽기작업
+## 문자 단위 읽기
+- 지정된 스트림으로부터 하나의 문자를 읽어 들이는 함수
+```c
+int fgetc(FILE *stream);  
+```
+
+## 문자열 단위 읽기
+- 첫 번째 매개변수(str)에는 파일에서 읽은 문자열을 저장할 메모리의 주소를 넘겨주면 된다.
+- 두 번째 매개변수(numChars)에는 저장할 문자의 최대 개수를 지정한다.
+- 세 번째 매개변수(stream)은 파일포인터를 넣어준다.
+```c
+char* fgets(char* str, int numChars, FILE* stream);
+```
+
+
+
+## 파일 읽어오기
+```c
+#include <stdio.h>
+
+int main(){
+	// 회원가입.txt 를 읽기 전용(r)으로 text 모드(t)로 열기
+	FILE* pFile = NULL;
+	fopen_s(&pFile, "회원가입.txt", "rt");
+
+	if (pFile != NULL){
+		char str[128];
+		if (fgets(str, 128, pFile) != NULL){
+			// 읽어온 문자열을 화면에 출력한다.
+			printf("%s", str);
+		} else {
+		    printf("파일에서 문자열을 읽지 못하였습니다.");
+		}
+		// 파일을 다 사용했으니, 파일을 닫는다.
+		fclose(pFile);
+	}
 
 	return 0;
 }
