@@ -42,7 +42,7 @@
 
 ![image](https://github.com/to7485/Clang/assets/54658614/69f7dfe8-003b-4cfa-94a0-d26f8388dc9e)
 
-# 포인터의 봅습
+# 포인터의 복습
 - 포인터 변수의 선언
 ```c
 //자료형* 포인터변수명;
