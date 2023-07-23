@@ -124,6 +124,218 @@ void main() {
     - 노드 삭제(RemoveNode)
     - 노드 삽입(InsertAfter, InsertNewHead)
 
+### 노드 생성/소멸 연산
+- 노드는 Heap 영역에 생성해서 우리가 원할 때 메모리를 할당받고 원할 때 소멸시켜야 한다.
+```c
+Node* SLL_CreateNode(ElementType NewData) {
+	Node* NewNode = (Node*)malloc(sizeof(Node));
+	//malloc()은 메모리를 할당해주고 그 주소를 void*형으로 반환한다.
+	//그렇기 때문에 Node형으로 형변환을 해줘야 한다.
+
+	NewNode->Data = NewData; //데이터를 저장한다.
+	NewNode->NextNode = NULL;
+}
+```
+- 노드가 존재하는 주소를 가리키는 포인터를 입력받아 free()함수에 넘겨 해당 노드를 소멸시킨다.
+
+```c
+void SLL_DestoryNode(Node* Node) {
+	free(Node);
+}
+```
+
+### 노드 추가 연산
+- 노드 추가는 링크드 리스트의 Tail Node 뒤에 새로운 Node를 만들어 연결하는 연산이다.
+- 꼬리를 덧붙히는 모양
+
+![image](https://github.com/to7485/Clang/assets/54658614/2b1433ec-bd0e-4e6a-b6ea-fd2a7ee52340)
+
+- Heap영역에 SLL_CreateNode()함수를 이용하여 Node한개를 생성한다음,
+-  생성한 노드의 주소를 Tail의 NextNode의 포인터에 저장해주자.
+
+```c
+void SLL_AppendNode(Node** _Head, Node* _NewNode) {
+	//Head Node가 NULL이라면 새로운 Node가 Head가 된다.
+	if ((*Head) == NULL) {
+		*Head = NewNode;
+	}
+	else {
+		//Tail을 찾아 NewNode에 연결한다.
+		Node* Tail = (*Head);
+		while (Tail->NextNode != NULL) {
+			Tail = Tail->NextNode;
+		}
+		Tail->NextNode = NewNode;
+	}
+}
+```
+#### 더블포인터 **를 써야하는 이유
+- SLL_Append()함수를 호출할 때 SLL_AppendNode()의 매개변수들은 지역변수이기 때문에 Stack영역에 만들어진다.
+- List는 _Head에, NewNode는 _NewNode에 자신이 가리키는 주소를 '복사'해 넣습니다.
+- 싱글포인터를 사용하게 되면 SLL_AppendNode()함수를 호출할 때 List포인터가 담고 있는 '주소값'만 _Head에 복사가 된다.
+- 정작 List 포인터 변수의 주소는 전달이 되지 않는 상황이 된다.
+- 그렇기 때문에 SLL_AppendNode()함수가 호출된 후 매개변수 _Head와 _Node는 소멸되기 때문에 List는 그냥 NULL로 남아있게 된다.
+- 포인터가 가진 값이 아닌 포인터 자신의 주소를 넘겨야 하는 것이다.
+
+
+- main에서 다음과 같이 사용한다.
+```c
+void main() {
+	Node* List = NULL;
+	Node* NewNode = NULL;
+	NewNode = SLL_CreateNode(117); //Heap영역에 Node 생성
+	SLL_AppendNode(&List, NewNode);//생성한 Node를 List에 추가
+	NewNode = SLL_CreateNode(119);//Heap영역에 또 다른 Node 생성
+	SLL_AppendNode(&List, NewNode);//생성한 Node를 List에 추가
+}
+```
+### 노드 탐색 연산
+- 배열에서는 어떤 위치에 있는 요소를 취하고 싶을 때 해당 요소의 첨자를 입력하면 바로 해당 요소에 접근할 수 있다.
+- 이에 반해 링크드 리스트는 헤드부터 시작해서 다음 노드에 대한 포인터를 징검다리 삼아 차근차근 노드의 개수만큼 거쳐야만 원하는 요소에 접근할 수 있다.
+- 찾고자 하는요소가 N번째에 있다면 N-1개의 노드를 거쳐야 한다는 것이다.
+
+```c
+Node* SLL_GetNodeAt(Node* Head, int Location) {
+	Node* Current = Head; //Current에 Head를 대입한다.
+	while (Current != NULL && (--Location) >= 0) {
+		Current = Current->NextNode; //NextNode의 주소값을 넣어준다.
+	}
+	return Current;
+}
+```
+- 이 함수는 다음과 같이 사용할 수 있다.
+
+```c
+void main() {
+	Node* List = NULL;
+	Node* NewNode = NULL;
+	Node* MyNode = NULL;
+	NewNode = SLL_CreateNode(117); //Heap영역에 Node 생성
+	SLL_AppendNode(&List, NewNode);//생성한 Node를 List에 추가
+	NewNode = SLL_CreateNode(119);//Heap영역에 또 다른 Node 생성
+	SLL_AppendNode(&List, NewNode);//생성한 Node를 List에 추가
+
+	MyNode = SLL_GetNodeAt(List, 1); //두 번째 노드의 주소를 MyNode에 저장
+	printf("%d\n", MyNode->Data); //119를 출력
+}
+```
+
+### 노드 삭제 연산
+- 링크드 리스트 내 임의의 노드를 제거하는 연산이다.
+- 삭제하고자 하는 노드를 찾은 후 해당 노드의 다음 노드를 이전 노드의 NextNode 포인터에 연결하면 그 노드를 삭제할 수 있다.
+
+![image](https://github.com/to7485/Clang/assets/54658614/77c6d792-01da-4891-8863-aa4a771b1329)
+
+```c
+void SLL_RemoveNode(Node** Head, Node* Remove) {
+	if (*Head == Remove) {
+		*Head == Remove->NextNode;
+	}
+	else {
+		Node* Current = *Head;
+		while (Current != NULL && Current->NextNode != Remove) {
+			Current = Current->NextNode;
+		}
+		if (Current != NULL) {
+			Current->NextNode = Remove->NextNode;
+		}
+	}
+}
+```
+
+- 노드를 삭제해보자.
+
+```c
+void main() {
+	Node* List = NULL;
+	Node* NewNode = NULL;
+	Node* MyNode = NULL;
+	NewNode = SLL_CreateNode(117); //Heap영역에 Node 생성
+	SLL_AppendNode(&List, NewNode);//생성한 Node를 List에 추가
+	NewNode = SLL_CreateNode(119);//Heap영역에 또 다른 Node 생성
+	SLL_AppendNode(&List, NewNode);//생성한 Node를 List에 추가
+
+	MyNode = SLL_GetNodeAt(List, 1); //두 번째 노드의 주소를 MyNode에 저장
+	printf("%d\n", MyNode->Data); //119를 출력
+
+	NewNode = SLL_CreateNode(212);//Heap영역에 또 다른 Node 생성
+	SLL_AppendNode(&List, NewNode);//생성한 Node를 List에 추가
+
+	SLL_RemoveNode(&List, MyNode); //두 번째 노드 제거
+	SLL_DestoryNode(MyNode); //링크드 리스트에서 제거한 노드를 메모리에서 완전히 소멸시킴
+}
+```
+
+### 노드 삽입 연산
+- 노드와 노드 사이에 새로운 노드를 끼워넣는 연산
+
+![image](https://github.com/to7485/Clang/assets/54658614/d595a7fc-8437-428e-9abd-862202f9b86a)
+
+```c
+void SSL_InsertAfter(Node* Current, Node* NewNode) {
+	NewNode->NextNode = Current->NextNode;
+	Current->NextNode = NewNode;
+}
+```
+
+### 정리코드
+```c
+void main() {
+	Node* List = NULL;
+	Node* NewNode = NULL;
+	Node* MyNode = NULL;
+	Node* Current = NULL;
+	int Count = 0;
+
+	NewNode = SLL_CreateNode(117); //Heap영역에 Node 생성
+	SLL_AppendNode(&List, NewNode);//생성한 Node를 List에 추가
+	NewNode = SLL_CreateNode(119);//Heap영역에 또 다른 Node 생성
+	SLL_AppendNode(&List, NewNode);//생성한 Node를 List에 추가
+
+
+	MyNode = SLL_GetNodeAt(List, 1); //두 번째 노드의 주소를 MyNode에 저장
+	
+	Count = SLL_GetNodeCount(List);//리스트의 개수 저장
+
+	for (int i = 0; i < Count; i++) {
+		Current = SLL_GetNodeAt(List, i);
+		printf("List[%d] : %d\n", i, Current->Data);
+	}
+
+	NewNode = SLL_CreateNode(212);//Heap영역에 또 다른 Node 생성
+	SLL_AppendNode(&List, NewNode);//생성한 Node를 List에 추가
+
+	SLL_RemoveNode(&List, MyNode); //두 번째 노드 제거
+	SLL_DestoryNode(MyNode); //링크드 리스트에서 제거한 노드를 메모리에서 완전히 소멸시킴
+
+	MyNode = SLL_GetNodeAt(List, 1); //두 번째 노드의 주소를 MyNode에 저장
+
+	Current = SLL_GetNodeAt(List, 0);
+	NewNode = SLL_CreateNode(3000);
+
+	SLL_InsertAfter(Current, NewNode);
+
+	//리스트의 출력
+	Count = SLL_GetNodeCount(List);
+	for (int i = 0; i < Count; i++) {
+		Current = SLL_GetNodeAt(List, i);
+		printf("List[%d] : %d\n", i, Current->Data);
+	}
+
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
