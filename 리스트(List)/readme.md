@@ -112,9 +112,17 @@ void main() {
 }
 ```
 
+### 링크드 리스트의 주요 연산
+- 링크드 리스트에는 두 종류의 연산이 필요하다.
+    1. 자료구조를 구축하기 위한 연산
+    2. 자료구조에 저장된 데이터를 활용하기 위한 연산
 
-
-
+- 링크드 리스트 자료구조의 여섯가지 주요 연산
+    - 노드 생성(CreateNode)/소멸(DestoryNode)
+    - 노드 추가(AppendNode)
+    - 노드 탐색(GetNodeAt)
+    - 노드 삭제(RemoveNode)
+    - 노드 삽입(InsertAfter, InsertNewHead)
 
 
 
