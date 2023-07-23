@@ -82,9 +82,35 @@ int* ptr = &a;
 - 링크드 리스트, 더블 링크드 리스트, 환형 링크드 리스트 등이 있다.
 
 
+## 링크드 리스트(Linked List)
+- 링크드 리스트는 리스트를 구현하는 여러 가지 기법 중에서도 가장 간단한 방법이다.
+- 링크드 리스트는 <b>노드를 연결해서 만든 리스트</b>이다.
 
+### 링크드 리스트의 노드
+- 링크드 리스트의 노드는 데이터를 보관하는 필드, 다음 노드와 연결고리 역할을 하는 포인터로 이루어진다.
 
+![image](https://github.com/to7485/Clang/assets/54658614/788fd02b-a6d2-4b1f-b97b-612d1702a1fd)
 
+- 데이터와 포인터로 이루어진 노드들을 다음과 같이 모두 엮으면 링크드 리스트가 되는것이다.
+
+![image](https://github.com/to7485/Clang/assets/54658614/add701e4-0e6a-4879-89f7-a01715cb1d5a)
+
+### 링크드 리스트의 노드 표현
+- 링크드 리스트의 노드를 C언어료 표현하면 다음과 같은 구조체로 나타낼 수 있다.
+- ElementType을 int로 정했지만, 나중에 각자 필요한 자료형으로 바꿔서 사용하면 된다.
+```c
+typedef int ElementType;
+
+typedef struct{
+	ElementType Data; //데이터
+	struct Node* NextNode;//다음노드
+}Node;
+
+void main() {
+    //이렇게 선언한 Node구조체로 간편하게 인스턴스를 만들 수 있다.
+	Node myNode;
+}
+```
 
 
 
