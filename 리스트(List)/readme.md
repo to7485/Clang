@@ -154,7 +154,7 @@ void SLL_DestoryNode(Node* Node) {
 -  생성한 노드의 주소를 Tail의 NextNode의 포인터에 저장해주자.
 
 ```c
-void SLL_AppendNode(Node** _Head, Node* _NewNode) {
+void SLL_AppendNode(Node** Head, Node* NewNode) {
 	//Head Node가 NULL이라면 새로운 Node가 Head가 된다.
 	if ((*Head) == NULL) {
 		*Head = NewNode;
