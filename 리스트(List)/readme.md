@@ -322,6 +322,15 @@ void main() {
 		printf("List[%d] : %d\n", i, Current->Data);
 	}
 
+	//모든 노드를 메모리에서 제거
+	for (int i = 0; i < Count; i++) {
+		Current = SLL_GetNodeAt(List, 0);
+		if (Current != NULL) {
+			SLL_RemoveNode(&List, Current);
+			SLL_DestoryNode(Current);
+		}
+	}
+
 }
 ```
 
@@ -332,14 +341,203 @@ void main() {
 - 특정 위치에 있는 노드에 접근하는 연산은 느리다.
 
 
+# 더블 링크드 리스트(Double Linked List)
+- LinkedList의 탐색 기능을 개선한 자료구조이다.
+- LinkedList에서 어떤 노드를 찾으려면 Head에서 Tail방향으로만 탐색할 수 있다.
+- Double Linked List에서는 양방향 탐색이 가능하다.
+- 양방향 탐색이 가능한 이유는 리스트를 구성하는 Node의 구조가 변경되었기 때문이다.
+- Double Linked List의 Node는 자신의 앞에있는 Node를 가리키는 포인터도 갖고 있습니다.
+- 그래서 Double Linked List의 Node는 앞뒤로 이동할 수 있다.
+
+![image](https://github.com/to7485/Clang/assets/54658614/4604c261-e4f8-4c9d-801e-3565c03a4511)
+
+## Node의 구성
+- Double Linked List의 Node의 구성은 다음과 같다.
+```c
+typedef int ElementType;
+
+typedef struct tagNode {
+	ElementType Data;
+	struct tagNode* PrevNode;
+	struct tagNode* NextNode;
+}Node;
+```
+
+![image](https://github.com/to7485/Clang/assets/54658614/206a0180-837c-4730-9de6-ca67289c496c)
 
 
+## Node의 생성/소멸
+```c
+//노드의 생성
+Node* DLL_CreateNode(ElementType NewData) {
+	Node* NewNode = (Node*)malloc(sizeof(Node));
 
+	NewNode->Data = NewData;
+	NewNode->PrevNode = NULL;
+	NewNode->NextNode = NULL;
 
+	return NewNode;
+}
+```
+- 노드의 소멸
+- 링크드리스트와 동일하게 free()함수를 호출한다.
+```c
+//노드의 소멸
+void DLL_DestoryNode(Node* Node) {
+	free(Node);
+}
+```
 
+## 노드의 추가연산
+- Double Linked List에서는 새로운 Tail의 PrevNode 포인터도 기존 Tail의 주소를 가리키도록 해야 한다.
 
+![image](https://github.com/to7485/Clang/assets/54658614/e8a1b649-75ad-4e1f-b820-b006fc6882e9)
 
+```c
+//노드의 추가
+void DLL_AppendNode(Node** Head, Node* NewNode) {
+	//헤드 노드가 NULL이라면 새로운 노드가 Head가 된다.
+	if ((*Head) == NULL) {
+		*Head = NewNode;
+	}
+	else {
+		//테일을 찾아 NewNode를 연결한다.
+		Node* Tail = (*Head);
+		while (Tail->NextNode != NULL) {
+			Tail = Tail->NextNode;
+		}
 
+		Tail->NextNode = NewNode;
+		NewNode->PrevNode = Tail;//기존의 Tail을 새로운 Tail의 PrevNode가 가리킴
+	}
+}
+```
 
+## 노드의 탐색
+```c
+//노드 탐색
+Node* DLL_GetNodeAt(Node* Head, int Location) {
+	Node* Current = Head;
+	while (Current != NULL && (--Location) >= 0) {
+		Current = Current->NextNode;
+	}
+	return Current;
+}
+```
 
+## 노드 삭제 연산
+- 삭제할 노드의 양쪽 포인터 2개, 이전노드의 NextNode 포인터, 다음노드의 PrevNode 포인터 4개의 포인터를 다뤄야 한다.
 
+![image](https://github.com/to7485/Clang/assets/54658614/13d18bb4-deae-4669-bf72-6dd09f5b8fdf)
+
+```c
+//노드의 삭제
+void DLL_RemoveNode(Node** Head, Node* Remove) {
+	if (*Head == Remove) {
+		*Head = Remove->NextNode;
+		if ((*Head) != NULL) {
+			(*Head)->PrevNode = NULL;
+		}
+		Remove->PrevNode = NULL;
+		Remove->NextNode = NULL;
+	}
+	else {
+		Node* Temp = Remove;
+
+		if (Remove->PrevNode != NULL) {
+			Remove->PrevNode->NextNode = Temp->NextNode;
+		}
+		if (Remove->NextNode != NULL) {
+			Remove->NextNode->PrevNode = Temp->PrevNode;
+		}
+
+		Remove->PrevNode = NULL;
+		Remove->NextNode = NULL;
+	}
+}
+```
+
+## 노드 삽입
+- 새로운 노드를 삽입할 때 PrevNode 포인터로는 이전 노드를, NextNode 포인터로는 다음 노드를 가리키게 합니다.
+- 그리고 이전 노드의 NextNode포인터와 다음 노드의 PrevNode포인터는 새 노드를 가리키게 합니다.
+
+![image](https://github.com/to7485/Clang/assets/54658614/7a110308-4090-42b6-94bf-93bb2c313965)
+
+```c
+//노드 삽입
+void DLL_InsertAfter(Node* Current, Node* NewNode) {
+	//새 노드의 다음포인터를 현재노드의 다음포인터에 연결
+	NewNode->NextNode = Current->NextNode;
+	//새 노드의 이전포인터를 현재 노드를 가리키게 연결
+	NewNode->PrevNode = Current;
+
+	if (Current->NextNode != NULL) {
+		Current->NextNode->PrevNode = NewNode;
+		//Current->NextNode->PrevNode(다음노드의 이전포인터)
+		Current->NextNode = NewNode;
+	}
+}
+```
+
+## 노드 개수세기 연산
+```c
+//노드 개수
+int DLL_GetNodeCount(Node* Head) {
+	unsigned int Count = 0;
+	Node* Current = Head;
+	while (Current != NULL) {
+		Current = Current->NextNode;
+		Count++;
+	}
+	return Count;
+}
+```
+
+## 더블링크드 리스트 예제 프로그램
+```c
+void main() {
+	int Count = 0; //노드의 개수
+	Node* List = NULL; //노드가 없는 NULL 리스트
+	Node* NewNode = NULL;
+	Node* Current = NULL;
+
+	//노드 5개 추가
+	for (int i = 0; i < 5; i++) {
+		NewNode = DLL_CreateNode(i);
+		DLL_AppendNode(&List, NewNode);
+	}
+
+	//리스트 출력
+	Count = DLL_GetNodeCount(List);
+	for (int i = 0; i < Count; i++) {
+		Current = DLL_GetNodeAt(List, i);
+		printf("List[%d] : %d\n", i, Current->Data);
+	}
+
+	//리스트의 세번째 칸 뒤에 노드 삽입
+	printf("\nInserting 3000 After [2]...\n");
+
+	Current = DLL_GetNodeAt(List, 2);
+	NewNode = DLL_CreateNode(3000);
+	DLL_InsertAfter(Current, NewNode);
+
+	//리스트 출력
+	Count = DLL_GetNodeCount(List);
+	for (int i = 0; i < Count; i++) {
+		Current = DLL_GetNodeAt(List, i);
+		printf("List[%d] : %d\n", i, Current->Data);
+	}
+
+	// 모든 노드를 메모리에서 제거
+	printf("\nDestorying List..\n");
+	Count = DLL_GetNodeCount(List);
+
+	for (int i = 0; i < Count; i++) {
+		Current = DLL_GetNodeAt(List, 0);
+		if (Current != NULL) {
+			DLL_RemoveNode(&List, Current);
+			DLL_DestoryNode(Current);
+		}
+	}
+}
+```
