@@ -184,7 +184,7 @@ char* fgets(char* str, int numChars, FILE* stream);
 int main(){
 	// 회원가입.txt 를 읽기 전용(r)으로 text 모드(t)로 열기
 	FILE* pFile = NULL;
-	fopen_s(&pFile, "회원가입.txt", "rt");
+	pFile = fopen_s("회원가입.txt", "rt");
 
 	if (pFile != NULL){
 		char str[128];
