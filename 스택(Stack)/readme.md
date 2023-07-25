@@ -46,15 +46,49 @@ ElementType Data;
 
 ```c
 typedef struct tagArrayStack{
-  int Capacity;
-  int Top;
-  Node* Nodes;
+  int Capacity; //노드의 개수
+  int Top; //최상위 노드의 위치
+  Node* Nodes; //노드 배열
 } ArrayStack;
 ```
 
+- 노드배열을 자유 저장소(Heap)에 할당하고 Node포인터는 자유 저장소(Heap)에 할당된 배열을 가리키는 용도로 사용할 것이다.
 
+![image](https://github.com/to7485/Clang/assets/54658614/96cef174-d4ab-45d4-9a35-7bc2b77a9ef0)
 
+## 스택 및 노드 생성/소멸
 
+### 스택의 생성
+- 첫번째 인자는 ArrayStack 구조체이고, 두번재는 스택의 용량을 나타내는 노드의 개수이다.
+- 처음 호출된 malloc()은 ArrayStack을 자유저장소(Heap)에 쌓기 위해 사용됐고
+- 두번재 호출된 malloc()은 매개변수로 입력된 개수만큼 노드를 미리 생성하는데 사용이 되었다.
+- ArrayStack의 Capacity는 배열의 용량을 저장하고 최상위 노드의 위치를 가리키는 Top을 -1로 초기화 한다.
+- Top을 0이 아닌 -1로 초기화를 하는 이유는 C언어에서 첫 번째 배열의 요소를 가리키는 첨자가 0이므로 비어있는 스택의 최상위 위치가 이보다 작아야 하기 때문이다.
+- Top은 노드가 삽입될 때마다 1씩 증가하고 노드가 삭제될 때마다 1씩 감소합니다.
+```c
+void AS_CreateStack(ArrayStack** Stack, int Capacity) {
+	//스택을 자유 저장소(Heap)에 생성
+	(*Stack) = (ArrayStack*)malloc(sizeof(ArrayStack));
+
+	//입력된 Capacity만큼의 노드를 자유 저장소(Heap)에 생성
+	(*Stack)->Nodes = (Node*)malloc(sizeof(Node)*Capacity);
+
+	//Capacity 및 Top의 초기화
+	(*Stack)->Capacity = Capacity;
+	(*Stack)->Top = -1;
+}
+```
+
+### 스택의 삭제
+```c
+void AS_DestroyStack(ArrayStack* Stack) {
+	//노드를 자유 저장소에서 해제
+	free(Stack->Nodes);
+
+	//스택을 자유 저장소에서 해제
+	free(Stack);
+}
+```
 
 
 
