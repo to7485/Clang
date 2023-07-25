@@ -39,3 +39,25 @@ ElementType Data;
   - 용량
   - 최상위 노드의 위치
   - 노드 배열
+ 
+- 용량은 스택이 얼마만큼의 노드를 가질 수 있는지 알기 위해 사용된다.
+- 최상위 노드의 위치는 삽입/제거 연산을 할 때 최상위 노드에 접근할 수 있게 도와준다.
+- 노드 배열은 스택에 쌓이는 노드를 보관하는데 사용된다.
+
+```c
+typedef struct tagArrayStack{
+  int Capacity;
+  int Top;
+  Node* Nodes;
+} ArrayStack;
+```
+
+
+
+
+
+
+
+
+
+
