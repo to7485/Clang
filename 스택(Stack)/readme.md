@@ -90,8 +90,67 @@ void AS_DestroyStack(ArrayStack* Stack) {
 }
 ```
 
+## 노드 삽입 연산
+- 삽입(Push)연산은 최상위 노드의 Index(Top)에서 1을 더한 곳에 새 노드를 입력하도록 구현한다.
+```c
+void AS_Push(ArrayStack* Stack, ElementType Data) {
+	Stack->Top++;
+	Stack->Nodes[Stack->Top].Data = Data;
+}
+```
 
+## 노드 제거 연산
+- 최상위 노드의 인덱스(Top)값을 1만큼 낮추도록 구현을 하면 된다.
+- 주의해야 할 점은 제거 연산에서는 최상위 노드에 있던 데이터를 반환을 해야 한다.
 
+```c
+ElementType AS_Pop(ArrayStack* Stack) {
+	int Position = Stack->Top--;
+	return Stack->Nodes[Position].Data;
+}
+```
 
+# 배열 기반 스택 예제 프로그램
+```c
+int AS_GetSize(ArrayStack* Stack) { //스택의 사이즈를 반환
+	return Stack->Top + 1;
+}
+
+ElementType AS_Top(ArrayStack* Stack) { //최상위 노드의 데이터만 반환
+	return Stack->Nodes[Stack->Top].Data;
+}
+
+int AS_IsEmpty(ArrayStack* Stack) { //스택이 비어있는지 검사하는 함수
+	return(Stack->Top == -1);
+}
+
+void main() {
+	ArrayStack* Stack = NULL;
+
+	AS_CreateStack(&Stack, 10);
+
+	AS_Push(Stack, 3);
+	AS_Push(Stack, 37);
+	AS_Push(Stack, 11);
+	AS_Push(Stack, 12);
+
+	printf("Capacity: %d, Size: %d, Top:%d\n\n", Stack->Capacity, AS_GetSize(Stack), AS_Top(Stack));
+
+	for (int i = 0; i < 4; i++) {
+		if (AS_IsEmpty(Stack)) {
+			break;
+		}
+		printf("Popped: %d ", AS_Pop(Stack));
+		if (!AS_IsEmpty(Stack)) {
+			printf("Current Top: %d\n", AS_Top(Stack));
+		}
+		else {
+			printf("Stack is Empty.\n");
+		}
+	}
+
+	AS_DestroyStack(Stack);
+}
+```
 
 
