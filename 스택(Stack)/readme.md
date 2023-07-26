@@ -285,3 +285,70 @@ Node* LSS_Pop(LinkedListStack* Stack){
     return TopNode;
 };
 ```
+## 그 외의 메서드
+```c
+//최상위 노드를 반환
+Node* LLS_Top(LinkedListStack* Stack){
+    return Stack->Top;
+}
+
+//스택의 개수 반환
+int LLS_GetSize(LinkedListStack* Stack){
+    int Count = 0;
+    Node* Current = Stack->List;
+
+    while(Current != NULL){
+        Current = Current->NextNode;
+        Count++;
+    }
+    return Count;
+}
+
+//스택이 비어있는지 검증하는 메서드
+int LLS_IsEmpty(LinkedListStack* Stack){
+    return (Stack->List == NULL);
+}
+```
+
+## Linked List 기반 Stack 예제 프로그램
+```c
+int main(){
+    int Count = 0;
+    Node* Popped;
+
+    LinkedListStack* Stack;
+
+    LLS_CreateStack(&Stack);
+
+    LLS_Push(Stack, LLS_CreateNode("abc"));
+    LLS_Push(Stack, LLS_CreateNode("def"));
+    LLS_Push(Stack, LLS_CreateNode("efg"));
+    LLS_Push(Stack, LLS_CreateNode("hij"));
+
+    Count = LLS_GetSize(Stack);
+    printf("Size: %d, Top: %s\n",Count,LLS_Top(Stack)->Data);
+
+    for(int i = 0; i< Count; i++){
+        if(LLS_IsEmpty(Stack)){
+            break;
+        }
+        Popped = LLS_Pop(Stack);
+
+        printf("Popped: %s, ",Popped->Data);
+
+        LLS_DestroyNode(Popped);
+
+        if(!LLS_IsEmpty(Stack)){
+            printf("Current Top: %s\n",LLS_Top(Stack)->Data);
+        } else {
+            printf("Stack Is Empty.\n");
+        }
+    }
+
+    LLS_DestroyStack(Stack);
+
+
+
+    return 0;
+}
+```
