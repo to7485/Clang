@@ -152,5 +152,136 @@ void main() {
 	AS_DestroyStack(Stack);
 }
 ```
+# 링크드 리스트로 구현하는 스택
+- 링크드 리스트가 배열보다 좋은점은 스택 용량에 제한을 두지 않아도 된다는점이다.
 
+## 링크드 리스트 기반 스택과 스택의 노드 표현
+- 링크드 리스트는 배열과 달리 인덱스를 활용하여 노드에 접근할 수 없다.
+- 따라서 링크드 리스트로 스택을 구현하려면 노드는 자신의 위에 위치하는 노드에 대한 포인터를 갖고 있어야 한다.
+```c
+typedef struct tagNode{
+	char* Data;
+	struct tagNode* NextNode;
+}Node;
+```
 
+<img width="400" alt="image" src="https://github.com/to7485/Clang/assets/54658614/0af4e55b-7ec5-4434-82ab-5dcd4ba83ddf">
+
+- 링크드 리스트 스택은 배열 기반 스택과 달리 '스택의 용량'이나 '최상위 노드의 인덱스'가 없다.
+- 대신 링크드 리스트(List포인터)의 헤드와 테일(Top 포인터)에 대한 포이터가 필요합니다.
+```c
+typedef struct tagLinkedListStack{
+	Node* List; //데이터를 담는 링크드 리스트를 가리킨다.
+	Node* Top; // 스택의 입출력이 이루어지는 최상위 노드에 대한 포인터
+}LinkedListStack;
+```
+- Top포인터 없이도 List포인터를 사용해서 스택의 최상위 노드에 접근을 할 수 도 있다.
+- 대신 순차탐색을 해야 하기 때문에 비효율적이다.
+- Top포인터를 이용하면 8바이트를 소비하는 대신 최상위 노드를 찾는 시간을 아낄수 있다.
+
+<img width="484" alt="image" src="https://github.com/to7485/Clang/assets/54658614/7dd7e975-3178-40f6-bfc2-d11c2bef5ea7">
+
+## 링크드 리스트 기반 스택의 기본 연산
+- Single Linked List로 스택을 구현해보자.
+
+## 스택 생성/소멸 연산
+- 스택의 생성
+- LinkedListStack 구조체를 Heap영역에 할당하는것 뿐입니다.
+```c
+//스택의 생성
+void LLS_CreateStack(LinkedListStack** Stack){
+    //스택을 Heap영역에 생성
+    (*Stack) = (LinkedListStack*)malloc(sizeof(LinkedListStack));
+    (*Stack)->List = NULL;
+    (*Stack)->Top = NULL;
+};
+```
+- 스택의 소멸
+- 먼저 각 노드를 제거하고 Heap영역에서 LinkedListStack의 구조체의 할당을 해제합니다.
+```c
+//스택의 소멸
+void LLS_DestroyStack(LinkedListStack* Stack){
+    while(!LLS_IsEmpty(Stack)){
+        Node* Popped = LLS_Pop(Stack);
+        LLS_DestroyStack(Popped);
+    }
+
+    //스택을 Heap영역에서 해제
+    free(Stack);
+};
+```
+
+## 노드의 생성/소멸
+- 노드의 생성
+	- Stack의 Node를 Heap에 생성할 때 문자열을 저장할 공간도 함께 생성해야 한다.
+	- malloc()함수가 Node구조체를 할당하기 위해 한번, Node구조체의 Data필드를 할당하기 위해 한번 총 두번 호출된다는 사실을 알 수 있다.
+```c
+Node* LSS_CreateNode(char* NewData){
+    Node* NewNode = (Node*)malloc(sizeof(Node));
+    NewNode->Data = (char*)malloc(strlen(NewData)+1);
+
+    strcpy(NewNode->Data, NewData); //데이터를 저장한다.
+
+    NewNode->NextNode = NULL; //다음 노드에 대한 포인터는 NULL로 초기화한다.
+
+    return NewNode; //노드의 주소를 반환한다.
+};
+```
+
+- 노드의 소멸
+	- Data필드를 할당 해제 하기 위해 한번
+   	- 노드를 할당 해제 하기 위해 한번 free()함수는 총 두번 호출된다.
+```c
+void LSS_DestroyNode(Node* _Node){
+    free(_Node->Data);
+    free(_Node);
+};
+```
+
+## 노드 삽입 연산
+- 삽입 연산은 스택의 최상위 노드 Top에 새 노드를 얹도록 구현만 하면 된다.
+- 그리고 최상위 노드의 주소를 LinkedListStack 구조체의 Top필드에 등록하면 된다.
+```c
+//노드의 삽입
+void LSS_Push(LinkedListStack* Stack, Node* NewNode){
+    if(Stack->List == NULL){
+        Stack->List = NewNode;
+    } else{
+        //스택의 Top위에 새 노드를 얹는다.
+        //Stack->Top : 맨위에 있는 노드
+        Stack->Top->NextNode = NewNode;
+    }
+
+    //스택의 Top필드에 새 노드의 주소를 등록한다.
+    Stack->Top = NewNode;
+};
+```
+
+## 노드 삭제 연산
+- Linked List Stack에서 제거 연산은 네 단계로 이루어진다.
+	- 현재 최상위 노드(Top)의 주소를 다른 포인터에 복사한다.
+ 	- 새로운 최상위 노드(현재 최상위 노드)의 바로 아래(이전)노드를 찾는다.
+  	- LnikedListStack 구조체의 Top 필드에 새로운 최상위 노드의 주소를 등록한다.
+  	- 단계1에서 포인터에 저장했던 예전 최상위 노드의 주소를 반환한다.
+```c
+//노드의 삭제
+Node* LSS_Pop(LinkedListStack* Stack){
+    //LSS_Pop()함수가 반환할 최상위 노드 저장
+    Node* TopNode = Stack->Top;
+
+    if(Stack->List == Stack->Top){
+        Stack->List = NULL;
+        Stack->Top = NULL;
+    } else{
+        //Top아래에 있던 노드를 새로운 CurrentTop에 저장
+        Node* CurrentTop = Stack->List;
+        while(CurrentTop != NULL && CurrentTop->NextNode != Stack->Top){
+            CurrentTop = CurrentTop->NextNode;
+        }
+        //CurrentTop을 Top에 저장
+        Stack->Top = CurrentTop;
+        Stack->Top->NextNode = NULL;
+    }
+    return TopNode;
+};
+```
