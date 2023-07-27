@@ -216,7 +216,7 @@ void LLS_DestroyStack(LinkedListStack* Stack){
 	- Stack의 Node를 Heap에 생성할 때 문자열을 저장할 공간도 함께 생성해야 한다.
 	- malloc()함수가 Node구조체를 할당하기 위해 한번, Node구조체의 Data필드를 할당하기 위해 한번 총 두번 호출된다는 사실을 알 수 있다.
 ```c
-Node* LSS_CreateNode(char* NewData){
+Node* LLS_CreateNode(char* NewData){
     Node* NewNode = (Node*)malloc(sizeof(Node));
     NewNode->Data = (char*)malloc(strlen(NewData)+1);
 
@@ -232,7 +232,7 @@ Node* LSS_CreateNode(char* NewData){
 	- Data필드를 할당 해제 하기 위해 한번
    	- 노드를 할당 해제 하기 위해 한번 free()함수는 총 두번 호출된다.
 ```c
-void LSS_DestroyNode(Node* _Node){
+void LLS_DestroyNode(Node* _Node){
     free(_Node->Data);
     free(_Node);
 };
@@ -243,7 +243,7 @@ void LSS_DestroyNode(Node* _Node){
 - 그리고 최상위 노드의 주소를 LinkedListStack 구조체의 Top필드에 등록하면 된다.
 ```c
 //노드의 삽입
-void LSS_Push(LinkedListStack* Stack, Node* NewNode){
+void LLS_Push(LinkedListStack* Stack, Node* NewNode){
     if(Stack->List == NULL){
         Stack->List = NewNode;
     } else{
@@ -265,8 +265,8 @@ void LSS_Push(LinkedListStack* Stack, Node* NewNode){
   	- 단계1에서 포인터에 저장했던 예전 최상위 노드의 주소를 반환한다.
 ```c
 //노드의 삭제
-Node* LSS_Pop(LinkedListStack* Stack){
-    //LSS_Pop()함수가 반환할 최상위 노드 저장
+Node* LLS_Pop(LinkedListStack* Stack){
+    //LLS_Pop()함수가 반환할 최상위 노드 저장
     Node* TopNode = Stack->Top;
 
     if(Stack->List == Stack->Top){
