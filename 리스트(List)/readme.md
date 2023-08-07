@@ -474,8 +474,8 @@ void DLL_InsertAfter(Node* Current, Node* NewNode) {
 	if (Current->NextNode != NULL) {
 		Current->NextNode->PrevNode = NewNode;
 		//Current->NextNode->PrevNode(다음노드의 이전포인터)
-		Current->NextNode = NewNode;
 	}
+	Current->NextNode = NewNode;
 }
 ```
 
