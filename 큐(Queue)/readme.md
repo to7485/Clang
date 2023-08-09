@@ -23,7 +23,7 @@
 - 시작과 끝을 연결해서 효율적인 삽입/삭제 연산이 가능하도록 고안된 큐
 - C언어의 경우 배열의 시작과 끝을 연결하는 방법을 제공하지 않기 때문에 이 구조를 직접 코드로 구현해야 한다.
 
-## 공백과 포화상태
+### 공백과 포화상태
 - 큐가 포화 상태일 때뿐 아니라 공백 상태일 때도 전단과 후단이 만나기 때문에 두 상태를 구분하는 방법을 찾아야 한다.
 
 ![image](https://github.com/to7485/Clang/assets/54658614/54738f5d-3d93-4e6e-86aa-8781eaa106a5)
@@ -33,10 +33,10 @@
 
 ![image](https://github.com/to7485/Clang/assets/54658614/4478e18d-8edc-40c0-9a3f-d59d7d28940b)
 
-## 순환큐의 기본연산
+### 순환큐의 기본연산
 - 순환 큐는 배열을 기반으로 구현되며 삽입과 삭제 연산이 이루어질 때 전단과 후단을 변경함으로써 큐가 공백상태인지 포화상태인지 확인한다.
 
-## 순환 큐 선언
+### 순환 큐 선언
 - 순환 큐의 노드 구조체 선언
 ```c
 typedef int ElementType;
@@ -45,7 +45,7 @@ typedef struct Node {
 	ElementType Data;
 };
 ```
-## 순환큐 구조체
+### 순환큐 구조체
 - 순환큐를 나타내는 구조체는 용량(Capacity),전단의 위치(Front), 후단의 위치(Rear), 순환 큐 요소의 배열에 대한 포인터를 갖고 있다.
 ```c
 typedef struct CircularQueue {
@@ -64,7 +64,7 @@ typedef struct CircularQueue {
 
 ![image](https://github.com/to7485/Clang/assets/54658614/9069cb10-c021-4ba2-93f5-5d309631a0c5)
 
-## 순환 큐 생성/소멸 연산
+### 순환 큐 생성/소멸 연산
 - 순환 큐 생성
 ```c
 void  CQ_CreateQueue(CircularQueue** Queue, int Capacity)
@@ -89,7 +89,7 @@ void CQ_DestroyQueue(CircularQueue* Queue)
 }
 ```
 
-## 노드 삽입 연산
+### 노드 삽입 연산
 - 순환 큐에서 삽입 연산 구연은 후단의 위치를 가리키는 Rear를 다루는것이 핵심이다.
 
 ```c
@@ -117,7 +117,7 @@ void CQ_Enqueue(CircularQueue* Queue, ElementType Data)
 
 ![image](https://github.com/to7485/Clang/assets/54658614/7c7f2de7-c84b-426a-985f-0e48b8db6820)
 
-## 노드 제거 연산
+### 노드 제거 연산
 - 노드 제거연산에서는 전단을 나타내는 Front를 잘 관리해야 한다.
 ```c
 ElementType CQ_Dequeue(CircularQueue* Queue)
@@ -140,7 +140,7 @@ ElementType CQ_Dequeue(CircularQueue* Queue)
 
 ![image](https://github.com/to7485/Clang/assets/54658614/7ad366ff-ba05-497f-9685-1ffd9af977f7)
 
-## 공백 상태 확인
+### 공백 상태 확인
 - 전단과 후단의 값이 같으면 공백 상태라는 의미
 ```c
 int CQ_IsEmpty(CircularQueue* Queue)
@@ -149,7 +149,7 @@ int CQ_IsEmpty(CircularQueue* Queue)
 }
 ```
 
-## 포화 상태 확인
+### 포화 상태 확인
 - 순환 큐가 포화 상태인지 확인할 때는 두 가지 경우를 고려해야 한다.
 - 전단이 후단 앞에 있을 때 후단과 전단의 차이(Rear - Front)가 큐의 용량(Capacity)과 동일하면 순환큐는 포화상태
 - 또 다른 경우는 전단이 후단과 같은 위치 또는 뒤에 있고 후단에 1을 더한 값(Rear + 1)이 전단(Front)과 동일할 때
@@ -164,7 +164,7 @@ int CQ_IsFull(CircularQueue* Queue)
 }
 ```
 
-## 순환큐 프로그램 예제
+### 순환큐 프로그램 예제
 ```c
 int CQ_GetSize(CircularQueue* Queue)
 {
@@ -207,7 +207,15 @@ void main() {
 ```
 
 ## 링크드 큐
+- 링크드 큐는 순환큐보다 직관적으로 구현할 수 있다.
+- 링크드 큐의 각 노드는 이전 노드에 대한 포인터를 이용해 연결된다.
+- 삽입 연산을 할 때는 삽입하려는 노드에 후단을 연결한다.
+- 제거 연산을 할 때는 전단 노드 바로 다음 노드에서 전단에 대한 포인터를 거둔다.
 
+![image](https://github.com/to7485/Clang/assets/54658614/d8d5d1bc-d2b4-42fd-a781-8d0876ba30e0)
+
+- 링크드 큐와 순환 큐가 다른 또 한가지의 차이점은 큐가 가득찬 상태인지 확인할 필요가 없다는것이다.
+- 이론적으로 <b>용량 제한이 없어 '가득차다'의 개념이 없기</b> 때문이다.
 ### 노드 선언
 ```c
 typedef struct tagNode {
