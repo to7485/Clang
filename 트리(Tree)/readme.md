@@ -242,9 +242,233 @@ int main( void )
     return 0;
 }
 ```
+## 이진트리
+- 앞에서 왼쪽 자식- 오른쪽 형제 표현법을 이용하여 하나의 노드가 N개의 자식 노드를 가질 수 있는 트리를 구현했다.
+- 이진트리는 <b>하나의 노드가 자식노드를 2개까지만 가질 수 있다.</b>
 
+![image](https://github.com/to7485/Clang/assets/54658614/53ec14f3-6bd7-4ecf-95b7-3a4d0d991c41)
 
+- 이진트리 구조를 이용해 다양한 알고리즘이 개발되어 있다.
+- 수식 이진 트리 : 수식을 트리 형태로 표현하여 계산 할 수 있게 해주는 트리
+- 이진 탐색 트리 : 아주 빠른 데이터 검색을 가능하게 하는 트리
 
+## 이진트리의 종류
+- 이진트리의 가장 중요한 특징은 노드의 최대 차수가 2라는 사실이다.
+- 모든 이진 트리 노드의 자식 노드 수는 0,1,2중 하나이다.
 
+### 포화 이진 트리
+- 잎 노드를 제외한 모든 노드가 자식을 둘씩 가진 트리
+- 포화 이진트리는 잎 노드들이 모두 같은 깊이에 위치한다.
 
+![image](https://github.com/to7485/Clang/assets/54658614/8571e659-f3f0-4ea4-a721-b184c54b589e)
+
+### 완전 이진 트리
+- 잎 노드들이 트리 왼쪽부터 채워진다.
+
+![image](https://github.com/to7485/Clang/assets/54658614/5ab5dfa3-3bcc-44f4-bdc9-97c31c3d9f12)
+
+- 잎 노드 사이사이에 마치 이빨이 빠진듯한 모양을 한 이진 트리는 완전 이진 트리가 아니다.
+
+![image](https://github.com/to7485/Clang/assets/54658614/9936bf70-b594-427f-8303-c9c4a82ca461)
+
+- 이진 <b>트리를 이용한 검색에서는 트리의 노드를 가능한 한 완전한 모습으로 유지해야 높은 성능</b>을 낼 수 있다.
+
+### 높이 균형 트리
+- 뿌리 노드를 기준으로 왼쪽 하위 트리와 오른쪽 하위 트리의 높이가 2 이상 차이 나지 않는 이진 트리
+
+![image](https://github.com/to7485/Clang/assets/54658614/3d8122d9-26f6-4b88-bdf1-d2fc3c1d8ce8)
+
+- 완전 높이 균형 트리는 뿌리 노드를 기준으로 왼쪽 하위 트리와 오른쪽 하위 트리의 높이가 같은 이진 트리
+
+![image](https://github.com/to7485/Clang/assets/54658614/b26281d3-998b-400b-ad3f-ee192d64f06f)
+
+## 이진 트리의 순회
+- 트리에는 데이터 접근 순서로 분류한 몇 가지 순회 패턴이 있다.
+
+### 전위 순회
+- 뿌리 노드부터 시작하여 아래로 내려오면서 왼쪽 하위 트리를 방문하고, 왼쪽 하위 트리의 방문이 끝나면, 오른쪽 하위 트리를 방문한다.
+
+![image](https://github.com/to7485/Clang/assets/54658614/672f422d-d062-4793-9e45-a4970a858be1)
+
+### 중위 순회
+- 왼쪽 하위 트리부터 시작해서, 뿌리를 거쳐, 오른쪽 하위 트리를 방문한다.
+
+![image](https://github.com/to7485/Clang/assets/54658614/376ae0ac-e6f0-4d25-9977-da733d18550a)
+
+- 수식 트리
+- (1*2)+(7-8)을 수식 트리로 나타내면 다음과 같다.
+- 중위 순회로 노드를 방문하고, 각 하위 트리의 시작과 끝에는 ( 과 )를 붙히면 수식이 완성된다.
+
+![image](https://github.com/to7485/Clang/assets/54658614/e089f7b0-ac4f-4a2f-b895-69b2c84254bb)
+
+### 후위 순회
+- 왼쪽 하위 트리 -> 오른쪽 하위 트리 -> 뿌리 노드 순서
+
+![image](https://github.com/to7485/Clang/assets/54658614/b1ced962-4087-4fb1-bcac-8c2e2d347371)
+
+## 이진 트리의 기본 연산
+
+### 노드 선언
+- 이진 트리 노드를 나타내는 SBTNode 구조체는 왼쪽 자식을 가리키는 Left 필드와 오른쪽 자식을 가리키는 Right필드, 데이터를 담는 Data필드로 구성된다.
+
+```c
+typedef char ElementType;
+
+typedef struct tagSBTNode 
+{
+    struct tagSBTNode* Left;
+    struct tagSBTNode* Right;
+
+    ElementType Data;
+} SBTNode;
+```
+
+### 노드 생성/소멸 연산
+- malloc() 함수로 자유 저장소에 SBTNode 구조체의 크기만큼 메모리 공간을 할당하고, NewNode포인터에 저장한다.
+- NewNode의 Left필드와Right필드를 NULL로 초기화 하고 Data필드에 매개변수로 입력받은 NewData를 저장한다.
+
+```c
+SBTNode* SBT_CreateNode( ElementType NewData )
+{
+    SBTNode* NewNode = (SBTNode*)malloc( sizeof(SBTNode) );
+    NewNode->Left    = NULL;
+    NewNode->Right   = NULL;
+    NewNode->Data    = NewData;
+
+    return NewNode;
+}
+```
+
+- 노드의 소멸
+
+```c
+void SBT_DestroyNode( SBTNode* Node )
+{
+    free(Node);
+}
+```
+
+### 트리의 출력
+- 전위 순회를 응용한 이진 트리 출력
+```c
+void SBT_PreorderPrintTree( SBTNode* Node )
+{
+    if ( Node == NULL )
+        return;
+
+    //  뿌리 노드 출력 
+    printf( " %c", Node->Data );
+
+    //  왼쪽 하위 트리 출력 
+    SBT_PreorderPrintTree( Node->Left );
+
+    //  오른쪽 하위 트리 출력 
+    SBT_PreorderPrintTree( Node->Right );
+}
+```
+
+- 중위 순회를 응용한 이진 트리 출력
+
+```c
+void SBT_InorderPrintTree( SBTNode* Node )
+{
+    if ( Node == NULL )
+        return;
+    
+    //  왼쪽 하위 트리 출력 
+    SBT_InorderPrintTree( Node->Left );
+
+    //  뿌리 노드 출력 
+    printf( " %c", Node->Data );
+    
+    //  오른쪽 하위 트리 출력 
+    SBT_InorderPrintTree( Node->Right );
+}
+```
+
+- 후위 순회를 응용한 이진 트리 출력
+
+```c
+void SBT_PostorderPrintTree( SBTNode* Node )
+{
+    if ( Node == NULL )
+        return;
+    
+    //  왼쪽 하위 트리 출력 
+    SBT_PostorderPrintTree( Node->Left );
+
+    //  오른쪽 하위 트리 출력 
+    SBT_PostorderPrintTree( Node->Right );
+
+    //  뿌리 노드 출력 
+    printf( " %c", Node->Data );
+}
+```
+
+### 트리 소멸
+- 후위 순회를 응용한 트리의 소멸
+- 트리를 구축할 때는 노드들이 어떤 순서대로 생성되든 별로 문제가 되지 않는다.
+- 트리를 파괴할 때는 반드시 잎 노드부터 메모리에서 제거해야 한다.
+- 따라서 잎 노드부터 방문하여 뿌리 노드까지 거슬러 올라가는 후위 순회를 이용하면 문제없이 소멸시킬 수 있다.
+
+![image](https://github.com/to7485/Clang/assets/54658614/acb381de-fe8a-4c2d-a801-b9433665ecd1)
+
+```c
+void SBT_DestroyTree( SBTNode* Node )
+{
+    if ( Node == NULL )
+        return;
+
+    //  왼쪽 하위 트리 소멸 
+    SBT_DestroyTree( Node->Left );
+
+    //  오른쪽 하위 트리 소멸 
+    SBT_DestroyTree( Node->Right );
+
+    //  뿌리 노드 소멸 
+    SBT_DestroyNode( Node );
+}
+```
+
+## 이진 트리 예제 프로그램
+```c
+int main( void )
+{
+    //  노드 생성 
+    SBTNode* A = SBT_CreateNode('A');
+    SBTNode* B = SBT_CreateNode('B');
+    SBTNode* C = SBT_CreateNode('C');
+    SBTNode* D = SBT_CreateNode('D');
+    SBTNode* E = SBT_CreateNode('E');
+    SBTNode* F = SBT_CreateNode('F');
+    SBTNode* G = SBT_CreateNode('G');
+    
+    //  트리에 노드 추가 
+    A->Left  = B;
+    B->Left  = C;
+    B->Right = D;
+
+    A->Right = E;
+    E->Left  = F;
+    E->Right = G;
+    
+    //  트리 출력 
+    printf("Preorder ...\n");
+    SBT_PreorderPrintTree( A );
+    printf("\n\n");
+
+    printf("Inorder ... \n");
+    SBT_InorderPrintTree( A );
+    printf("\n\n");
+
+    printf("Postorder ... \n");
+    SBT_PostorderPrintTree( A );
+    printf("\n");
+
+    //  트리 소멸시키기 
+    SBT_DestroyTree( A );
+
+    return 0;
+}
+```
 
