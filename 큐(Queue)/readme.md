@@ -205,3 +205,101 @@ void main() {
 	CQ_DestroyQueue(Queue);
 }
 ```
+
+## 링크드 큐
+
+### 노드 선언
+```py
+typedef struct tagNode {
+	char* Data;
+	struct tagNode* NextNode;
+}Node;
+```
+### 링크드 큐 구조체
+```py
+typedef struct tagLinkedQueue {
+	Node* Front;
+	Node* Rear;
+	int Count;
+}LinkedQueue;
+```
+
+### 노드의 생성
+```py
+Node* LQ_CreateNode(char* NewData) {
+
+	Node* NewNode = (Node*)malloc(sizeof(Node));
+
+	NewNode->Data = (char*)malloc(strlen(NewData) + 1);
+
+	strcpy(NewNode->Data, NewData);
+
+	NewNode->NextNode = NULL; //다음 노드에 대한 포인터는 NULL로 초기화 한다.
+	return NewNode; //노드의 주소를 반환
+}
+```
+
+### 노드의 소멸
+```py
+void LQ_DestroyNode(Node* _Node) {
+	free(_Node->Data);
+	free(_Node);
+}
+```
+
+### 큐 생성
+```py
+void LQ_CreateQueue(LinkedQueue** Queue) {
+	//큐를 메모리에 할당
+	(*Queue) = (LinkedQueue*)malloc(sizeof(LinkedQueue));
+	(*Queue)->Front = NULL;
+	(*Queue)->Rear = NULL;
+	(*Queue)->Count = 0;
+}
+```
+
+### 큐 삭제
+```py
+void LQ_DestroyQueue(LinkedQueue* Queue) {
+	while (!LQ_IsEmpty(Queue)) {
+		Node* Popped = LQ_Dequeue(Queue);
+		LQ_DestroyNode(Popped);
+	}
+
+	free(Queue);
+}
+```
+
+### 노드 삽입
+```py
+void LQ_Enqueue(LinkedQueue* Queue, Node* NewNode) {
+	if (Queue->Front == NULL) {
+		Queue->Front = NewNode;
+		Queue->Rear = NewNode;
+		Queue->Count++;
+	}
+	else {
+		Queue->Rear->NextNode = NewNode;
+		Queue->Rear = NewNode;
+		Queue->Count++;
+	}
+}
+```
+### 노드 삭제
+```py
+//삭제하기
+Node* LQ_Dequeue(LinkedQueue* Queue) {
+	//LQ_Dequeue()가 반환할 최상위 노드
+	Node* Front = Queue->Front;
+
+	//삭제하려고 봤더니 노드가 하나밖에 없었음
+	if (Queue->Front->NextNode == NULL) {
+		Queue->Front = NULL;
+		Queue->Rear = NULL;
+	}
+	else {
+		Queue->Front = Queue->Front->NextNode;
+	}
+}
+```
+
