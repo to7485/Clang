@@ -209,14 +209,14 @@ void main() {
 ## 링크드 큐
 
 ### 노드 선언
-```py
+```c
 typedef struct tagNode {
 	char* Data;
 	struct tagNode* NextNode;
 }Node;
 ```
 ### 링크드 큐 구조체
-```py
+```c
 typedef struct tagLinkedQueue {
 	Node* Front;
 	Node* Rear;
@@ -225,7 +225,7 @@ typedef struct tagLinkedQueue {
 ```
 
 ### 노드의 생성
-```py
+```c
 Node* LQ_CreateNode(char* NewData) {
 
 	Node* NewNode = (Node*)malloc(sizeof(Node));
@@ -240,7 +240,7 @@ Node* LQ_CreateNode(char* NewData) {
 ```
 
 ### 노드의 소멸
-```py
+```c
 void LQ_DestroyNode(Node* _Node) {
 	free(_Node->Data);
 	free(_Node);
@@ -248,7 +248,7 @@ void LQ_DestroyNode(Node* _Node) {
 ```
 
 ### 큐 생성
-```py
+```c
 void LQ_CreateQueue(LinkedQueue** Queue) {
 	//큐를 메모리에 할당
 	(*Queue) = (LinkedQueue*)malloc(sizeof(LinkedQueue));
@@ -259,7 +259,7 @@ void LQ_CreateQueue(LinkedQueue** Queue) {
 ```
 
 ### 큐 삭제
-```py
+```c
 void LQ_DestroyQueue(LinkedQueue* Queue) {
 	while (!LQ_IsEmpty(Queue)) {
 		Node* Popped = LQ_Dequeue(Queue);
@@ -271,7 +271,7 @@ void LQ_DestroyQueue(LinkedQueue* Queue) {
 ```
 
 ### 노드 삽입
-```py
+```c
 void LQ_Enqueue(LinkedQueue* Queue, Node* NewNode) {
 	if (Queue->Front == NULL) {
 		Queue->Front = NewNode;
@@ -286,7 +286,7 @@ void LQ_Enqueue(LinkedQueue* Queue, Node* NewNode) {
 }
 ```
 ### 노드 삭제
-```py
+```c
 //삭제하기
 Node* LQ_Dequeue(LinkedQueue* Queue) {
 	//LQ_Dequeue()가 반환할 최상위 노드
@@ -302,4 +302,39 @@ Node* LQ_Dequeue(LinkedQueue* Queue) {
 	}
 }
 ```
+### 비어있는지 검증
+```c
+//비어있는지 검증
+int LQ_IsEmpty(LinkedQueue* Queue) {
+	return (Queue->Front == NULL);
+}
+```
 
+## 링크드 큐 예제
+```c
+#include <stdio.h>
+#include "LinkedQueue.h"
+
+
+void main() {
+	Node* Popped;
+	LinkedQueue* Queue;
+
+	LQ_CreateQueue(&Queue);
+
+	LQ_Enqueue(Queue, LQ_CreateNode("abc"));
+	LQ_Enqueue(Queue, LQ_CreateNode("def"));
+	LQ_Enqueue(Queue, LQ_CreateNode("ghi"));
+	LQ_Enqueue(Queue, LQ_CreateNode("jkl"));
+
+	printf("Queue Size : %d\n", Queue->Count);
+
+	while (LQ_IsEmpty(Queue) == 0) {
+		Popped = LQ_Dequeue(Queue);
+		printf("Dequeue: %s\n", Popped->Data);
+
+		LQ_DestroyNode(Popped);
+	}
+	LQ_DestroyQueue(Queue);
+}
+```
